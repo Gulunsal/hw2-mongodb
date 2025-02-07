@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/contacts');
-const { validateBody } = require('../middlewares/validateBody');
-const { isValidId } = require('../middlewares/isValidId');
+const validateBody = require('../middlewares/validateBody');
+const isValidId = require('../middlewares/isValidId');
 const { createContactSchema, updateContactSchema } = require('../schemas/contact');
 const ctrlWrapper = require('../utils/ctrlWrapper');
 
