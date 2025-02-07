@@ -11,6 +11,22 @@ const app = express();
 const { PORT = 3000, DB_HOST } = process.env;
 
 app.use(express.json());
+
+// Ana sayfa için karşılama mesajı
+app.get('/', (req, res) => {
+  res.json({
+    status: 200,
+    message: "Hoş geldiniz! Contacts API'ye erişmek için /contacts endpoint'ini kullanın.",
+    endpoints: {
+      getAllContacts: "GET /contacts",
+      getContactById: "GET /contacts/:id",
+      createContact: "POST /contacts",
+      updateContact: "PATCH /contacts/:id",
+      deleteContact: "DELETE /contacts/:id"
+    }
+  });
+});
+
 app.use('/contacts', contactsRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
