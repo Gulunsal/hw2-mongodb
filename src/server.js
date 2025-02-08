@@ -1,7 +1,12 @@
 const express = require('express');
+const logger = require('morgan');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const contactsRouter = require('./routers/contacts');
+const authRouter = require('./routers/auth');
+const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 
@@ -10,24 +15,21 @@ dotenv.config();
 const app = express();
 const { PORT = 3000, DB_HOST } = process.env;
 
+app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Ana sayfa için karşılama mesajı
 app.get('/', (req, res) => {
   res.json({
     status: 200,
-    message: "Hoş geldiniz! Contacts API'ye erişmek için /contacts endpoint'ini kullanın.",
-    endpoints: {
-      getAllContacts: "GET /contacts",
-      getContactById: "GET /contacts/:id",
-      createContact: "POST /contacts",
-      updateContact: "PATCH /contacts/:id",
-      deleteContact: "DELETE /contacts/:id"
-    }
+    message: "Welcome to Contacts API! Use /contacts endpoint with authentication to access the API."
   });
 });
 
-app.use('/contacts', contactsRouter);
+app.use('/auth', authRouter);
+app.use('/contacts', authenticate, contactsRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

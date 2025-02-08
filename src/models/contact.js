@@ -4,13 +4,13 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const contactSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'İsim alani zorunludur'],
+    required: [true, 'Name is required'],
     minlength: 3,
     maxlength: 20
   },
   phoneNumber: {
     type: String,
-    required: [true, 'Telefon numarasi zorunludur']
+    required: [true, 'Phone number is required']
   },
   email: {
     type: String,
@@ -22,7 +22,12 @@ const contactSchema = new mongoose.Schema({
   },
   contactType: {
     type: String,
-    required: [true, 'Kişi tipi zorunludur']
+    required: [true, 'Contact type is required']
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 }, { versionKey: false, timestamps: true });
 

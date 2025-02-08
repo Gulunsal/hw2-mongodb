@@ -1,6 +1,7 @@
 const Contact = require('../models/contact');
+const createError = require('http-errors');
 
-const getAllContacts = async (query) => {
+const getAllContacts = async (userId, query) => {
   const {
     page = 1,
     perPage = 10,
@@ -11,7 +12,7 @@ const getAllContacts = async (query) => {
   } = query;
 
   // Filtreleme seçenekleri
-  const filter = {};
+  const filter = { userId };
   if (type) filter.contactType = type;
   if (isFavourite !== undefined) filter.isFavourite = isFavourite;
 
@@ -40,24 +41,36 @@ const getAllContacts = async (query) => {
   };
 };
 
-const getContactById = async (contactId) => {
-  return await Contact.findById(contactId);
+const getContactById = async (userId, contactId) => {
+  const contact = await Contact.findOne({ _id: contactId, userId });
+  if (!contact) {
+    throw createError(404, "Contact not found");
+  }
+  return contact;
 };
 
-const createContact = async (contactData) => {
-  return await Contact.create(contactData);
+const createContact = async (userId, contactData) => {
+  return await Contact.create({ ...contactData, userId });
 };
 
-const updateContact = async (contactId, updateData) => {
-  return await Contact.findByIdAndUpdate(
-    contactId,
+const updateContact = async (userId, contactId, updateData) => {
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, userId },
     updateData,
     { new: true }
   );
+  if (!contact) {
+    throw createError(404, "Contact not found");
+  }
+  return contact;
 };
 
-const deleteContact = async (contactId) => {
-  return await Contact.findByIdAndDelete(contactId);
+const deleteContact = async (userId, contactId) => {
+  const contact = await Contact.findOneAndDelete({ _id: contactId, userId });
+  if (!contact) {
+    throw createError(404, "Contact not found");
+  }
+  return contact;
 };
 
 module.exports = {
