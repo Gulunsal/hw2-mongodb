@@ -15,7 +15,10 @@ dotenv.config();
 const app = express();
 const { PORT = 3000, DB_HOST } = process.env;
 
+app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Ana sayfa için karşılama mesajı
 app.get('/', (req, res) => {
@@ -119,7 +122,8 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/contacts', contactsRouter);
+app.use('/auth', authRouter);
+app.use('/contacts', authenticate, contactsRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
