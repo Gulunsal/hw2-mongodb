@@ -13,7 +13,8 @@ const notFoundHandler = require('./middlewares/notFoundHandler');
 dotenv.config();
 
 const app = express();
-const { PORT = 3000, DB_HOST } = process.env;
+const { DB_HOST } = process.env;
+const PORT = process.env.PORT || 10000;
 
 app.use(logger('dev'));
 app.use(cors());
