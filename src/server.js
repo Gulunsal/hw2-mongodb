@@ -38,6 +38,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/contacts', authenticate, contactsRouter);
+app.use('/images', require('./routers/imageRouter'));
 app.use(notFoundHandler);
 app.use(errorHandler);
 
@@ -45,7 +46,7 @@ mongoose.connect(DB_HOST)
   .then(() => {
     console.log('Veritabanı bağlantısı başarılı');
     app.listen(PORT, () => {
-      console.log(`Server ${PORT} portunda çalışıyor`);
+      console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch(error => {
