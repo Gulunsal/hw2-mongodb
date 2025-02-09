@@ -1,7 +1,8 @@
 const authService = require('../services/auth');
 const sendEmail = require('../helpers/sendEmail');
 const { generateTokens, verifyToken } = require('../helpers/jwt');
-const { User, Session } = require('../models');
+const User = require('../models/user');
+const Session = require('../models/session');
 const createError = require('http-errors');
 
 const register = async (req, res) => {
