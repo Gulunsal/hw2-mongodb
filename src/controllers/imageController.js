@@ -2,7 +2,7 @@ const cloudinary = require('cloudinary').v2;
 
 // Cloudinary yapılandırması
 cloudinary.config({
-  cloud_name: 'gulays',
+  cloud_name: 'dmvm00wz0',
   api_key: '132177498767267',
   api_secret: 'Wc_bBsIQrJFEcn0DngZuEyp9K3M'
 });
