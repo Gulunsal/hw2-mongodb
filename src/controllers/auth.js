@@ -66,10 +66,22 @@ const getAllUsers = async (req, res) => {
   });
 };
 
+const sendResetEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  
+  if (!user) {
+    throw createError(404, "User not found!");
+  }
+
+  // Token oluşturma ve e-posta gönderme işlemleri
+};
+
 module.exports = {
   register,
   login,
   refresh,
   logout,
-  getAllUsers
+  getAllUsers,
+  sendResetEmail
 }; 
