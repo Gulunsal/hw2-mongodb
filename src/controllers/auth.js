@@ -71,10 +71,11 @@ const sendResetEmail = async (req, res) => {
   const user = await User.findOne({ email });
   
   if (!user) {
-    throw createError(404, "User not found!");
+    return res.status(404).json({ message: "User not found!" });
   }
 
-  // Token oluşturma ve e-posta gönderme işlemleri
+  // Token oluşturma ve e-posta gönderme işlemleri burada
+  res.status(200).json({ message: "Reset email sent!" });
 };
 
 module.exports = {
@@ -82,6 +83,5 @@ module.exports = {
   login,
   refresh,
   logout,
-  getAllUsers,
-  sendResetEmail
+  getAllUsers
 }; 
