@@ -10,7 +10,6 @@ router.post('/register', validateBody(registerSchema), ctrlWrapper(ctrl.register
 router.post('/login', validateBody(loginSchema), ctrlWrapper(ctrl.login));
 router.post('/refresh', authenticate, ctrlWrapper(ctrl.refresh));
 router.post('/logout', authenticate, ctrlWrapper(ctrl.logout));
-router.post('/send-reset-email', validateBody(resetEmailSchema), ctrlWrapper(ctrl.sendResetEmail));
-router.post('/reset-pwd', validateBody(resetPasswordSchema), ctrlWrapper(ctrl.resetPassword));
+router.get('/users', ctrlWrapper(ctrl.getAllUsers));
 
 module.exports = router; 

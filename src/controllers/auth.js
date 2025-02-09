@@ -56,65 +56,12 @@ const logout = async (req, res) => {
   res.status(204).send();
 };
 
-const sendResetEmail = async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-  
-  if (!user) {
-    throw createError(404, "User not found!");
-  }
-
-  const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '5m' });
-  const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${resetToken}`;
-
-  try {
-    await sendEmail({
-      to: email,
-      subject: "Reset Your Password",
-      html: `
-        <h1>Password Reset Request</h1>
-        <p>Please click the link below to reset your password:</p>
-        <a href="${resetLink}">Reset Password</a>
-        <p>This link will expire in 5 minutes.</p>
-      `
-    });
-
-    res.json({
-      status: 200,
-      message: "Reset password email has been successfully sent.",
-      data: {}
-    });
-  } catch (error) {
-    throw createError(500, "Failed to send the email, please try again later.");
-  }
-};
-
-const resetPassword = async (req, res) => {
-  const { token, password } = req.body;
-  
-  let decodedToken;
-  try {
-    decodedToken = verifyToken(token);
-  } catch (error) {
-    throw createError(401, "Token is expired or invalid.");
-  }
-
-  const user = await User.findOne({ email: decodedToken.email });
-  if (!user) {
-    throw createError(404, "User not found!");
-  }
-
-  // Update password
-  user.password = password;
-  await user.save();
-
-  // Delete all sessions for this user
-  await Session.deleteMany({ userId: user._id });
-
+const getAllUsers = async (req, res) => {
+  const users = await User.find();
   res.json({
     status: 200,
-    message: "Password has been successfully reset.",
-    data: {}
+    message: "Successfully retrieved users!",
+    data: users
   });
 };
 
@@ -123,6 +70,5 @@ module.exports = {
   login,
   refresh,
   logout,
-  sendResetEmail,
-  resetPassword
+  getAllUsers
 }; 
