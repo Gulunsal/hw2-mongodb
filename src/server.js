@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
             "Yeni işlevsellikleri desteklemek için modelleri ve uç noktaları genişletmek."
         ],
         note: "Bu ödev, Node.js'de e-posta ve resimlerle çalışma konusundaki yeni kavramları öğrenmenize yardımcı olacak ve dış hizmetlerle çalışma konusunda etkili uygulamaları keşfetmenizi sağlayacaktır.",
-        encouragement: "O halde, zaman kaybetmeyin — Hadi pratik yapın! 🚀"
+        encouragement: "O halde, zaman kaybetmeyelim — Hadi pratik yapalım by @gulayduzgun :) "
     });
 });
 
