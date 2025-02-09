@@ -69,7 +69,7 @@ const getAllUsers = async (req, res) => {
 
 const sendResetEmail = async (req, res) => {
   const { email } = req.body;
-z
+
   try {
     const user = await User.findOne({ email });
     
