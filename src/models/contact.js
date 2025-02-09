@@ -22,12 +22,11 @@ const contactSchema = new mongoose.Schema({
   },
   contactType: {
     type: String,
-    required: [true, 'Contact type is required']
+    required: [true, 'Kişi tipi zorunludur']
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  photo: {
+    type: String,
+    default: null
   }
 }, { versionKey: false, timestamps: true });
 

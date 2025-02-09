@@ -1,5 +1,7 @@
 const createError = require('http-errors');
 const contactsService = require('../services/contacts');
+const { uploadImage } = require('../helpers/cloudinary');
+const fs = require('fs').promises;
 
 const getAllContacts = async (req, res) => {
   const contacts = await contactsService.getAllContacts(req.user._id, req.query);
@@ -24,7 +26,23 @@ const getContactById = async (req, res) => {
 };
 
 const createContact = async (req, res) => {
-  const contact = await contactsService.createContact(req.user._id, req.body);
+  let photoUrl = null;
+  
+  if (req.file) {
+    try {
+      photoUrl = await uploadImage(req.file.path);
+      await fs.unlink(req.file.path); // Dosyayı sil
+    } catch (error) {
+      await fs.unlink(req.file.path); // Hata durumunda da dosyayı sil
+      throw createError(500, "Error uploading image");
+    }
+  }
+
+  const contact = await contactsService.createContact(req.user._id, {
+    ...req.body,
+    photo: photoUrl
+  });
+
   res.status(201).json({
     status: 201,
     message: "Successfully created a contact!",
@@ -34,10 +52,27 @@ const createContact = async (req, res) => {
 
 const updateContact = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await contactsService.updateContact(req.user._id, contactId, req.body);
+  let photoUrl = null;
+
+  if (req.file) {
+    try {
+      photoUrl = await uploadImage(req.file.path);
+      await fs.unlink(req.file.path);
+    } catch (error) {
+      await fs.unlink(req.file.path);
+      throw createError(500, "Error uploading image");
+    }
+  }
+
+  const contact = await contactsService.updateContact(req.user._id, contactId, {
+    ...req.body,
+    ...(photoUrl && { photo: photoUrl })
+  });
+
   if (!contact) {
     throw createError(404, "Contact not found");
   }
+
   res.json({
     status: 200,
     message: "Successfully patched a contact!",
