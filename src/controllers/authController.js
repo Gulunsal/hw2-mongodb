@@ -64,30 +64,45 @@ const login = async (req, res) => {
 };
 
 const sendResetEmail = async (req, res) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    throw createError(404, "User not found!");
-  }
-
-  const resetToken = jwt.sign(
-    { email },
-    process.env.JWT_SECRET,
-    { expiresIn: '5m' }
-  );
-
-  const resetLink = `${process.env.APP_DOMAIN}/reset-password?token=${resetToken}`;
-
   try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        message: "User not found",
+        data: {}
+      });
+    }
+
+    const resetToken = jwt.sign(
+      { email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    const resetLink = `${process.env.APP_DOMAIN}/reset-pwd?token=${resetToken}`;
+    
     await sendResetPasswordEmail(email, resetLink);
+
+    // Test için token'ı response'da gösterelim
     res.json({
       status: 200,
       message: "Reset password email has been successfully sent.",
-      data: {}
+      data: {
+        resetToken, // Test için token'ı direkt veriyoruz
+        resetLink,  // Test için link'i de veriyoruz
+        email: user.email
+      }
     });
   } catch (error) {
-    throw createError(500, "Failed to send the email, please try again later.");
+    console.error('Send reset email error:', error);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+      data: {}
+    });
   }
 };
 
