@@ -13,26 +13,19 @@ const register = async (userData) => {
   }
 
   const user = await User.create(userData);
-  
-  const { password, ...userWithoutPassword } = user.toObject();
-  return userWithoutPassword;
+  return user;
 };
 
 const login = async (email, password) => {
   const user = await User.findOne({ email });
-  if (!user) {
-    throw createError(401, 'Email or password is wrong');
-  }
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
+  if (!user || !(await user.comparePassword(password))) {
     throw createError(401, 'Email or password is wrong');
   }
 
   // Eski oturumu sil
   await Session.deleteMany({ userId: user._id });
 
-  // Yeni token'lar oluştur
+  // Yeni tokenlar oluştur
   const tokens = generateTokens(user._id);
 
   // Yeni oturum oluştur
@@ -44,10 +37,10 @@ const login = async (email, password) => {
   return tokens;
 };
 
-const refresh = async (userId, oldRefreshToken) => {
+const refresh = async (userId, refreshToken) => {
   const session = await Session.findOne({ 
-    userId, 
-    refreshToken: oldRefreshToken,
+    userId,
+    refreshToken,
     refreshTokenValidUntil: { $gt: new Date() }
   });
 
@@ -58,7 +51,7 @@ const refresh = async (userId, oldRefreshToken) => {
   // Eski oturumu sil
   await Session.deleteMany({ userId });
 
-  // Yeni token'lar oluştur
+  // Yeni tokenlar oluştur
   const tokens = generateTokens(userId);
 
   // Yeni oturum oluştur

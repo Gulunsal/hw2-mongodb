@@ -4,30 +4,24 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const contactSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
-    minlength: 3,
-    maxlength: 20
-  },
-  phoneNumber: {
-    type: String,
-    required: [true, 'Phone number is required']
+    required: [true, 'Set name for contact'],
   },
   email: {
     type: String,
-    required: false
+    required: [true, 'Set email for contact'],
   },
-  isFavourite: {
-    type: Boolean,
-    default: false
-  },
-  contactType: {
+  phone: {
     type: String,
-    required: [true, 'Contact type is required']
+    required: [true, 'Set phone for contact'],
   },
-  userId: {
+  photo: {
+    type: String,
+    default: null,
+  },
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'user',
+    required: true,
   }
 }, { versionKey: false, timestamps: true });
 
