@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/contactsController');
-const { validateBody } = require('../middlewares/validateBody');
+const validateBody = require('../middlewares/validateBody');
 const { schemas } = require('../models/contact');
-const { isValidId } = require('../middlewares/isValidId');
+const isValidId = require('../middlewares/isValidId');
 const upload = require('../middlewares/upload');
 
 router.get('/', ctrl.getAllContacts);
