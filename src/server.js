@@ -16,6 +16,7 @@ const errorHandler = require('./middlewares/errorHandler');
 
 dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 10000;
 
 // Tmp klasörünü oluştur
 const tmpDir = path.join(__dirname, '../tmp');
@@ -43,11 +44,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 200,
     message: "Server is running",
-    data: {
-      timestamp: new Date(),
-      environment: process.env.NODE_ENV || 'development',
-      dbStatus: mongoose.connection.readyState
-    }
+    dbStatus: mongoose.connection.readyState
   });
 });
 
@@ -63,66 +60,21 @@ app.use((req, res) => {
   });
 });
 
-// Enhanced error handler
+// Simple error handler
 app.use((err, req, res, next) => {
-  logError(err);
-  
-  const status = err.status || 500;
-  const message = err.message || 'Internal Server Error';
-
-  res.status(status).json({
-    status,
-    message,
-    data: {},
-    error: process.env.NODE_ENV === 'development' ? {
-      stack: err.stack,
-      code: err.code
-    } : undefined
-  });
+  console.error(err);
+  res.status(500).json({ error: err.message });
 });
 
-// Database connection with retry logic
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.DB_HOST, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    });
-    console.log('Database connection successful');
-  } catch (error) {
-    console.error('Database connection error:', error);
-    // Retry after 5 seconds
-    setTimeout(connectDB, 5000);
-  }
-};
-
-// Start server only after DB connection
-const startServer = async () => {
-  try {
-    await connectDB();
-    
-    const PORT = process.env.PORT || 3000;
+// Connect to MongoDB and start server
+mongoose.connect(process.env.DB_HOST)
+  .then(() => {
+    console.log('Connected to MongoDB');
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      console.log('Environment:', process.env.NODE_ENV);
-      console.log('Database status:', mongoose.connection.readyState);
     });
-  } catch (error) {
-    console.error('Server startup error:', error);
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
     process.exit(1);
-  }
-};
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (error) => {
-  console.error('Unhandled Rejection:', error);
-  process.exit(1);
-});
-
-// Start the server
-startServer();
+  });

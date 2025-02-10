@@ -5,25 +5,33 @@ const User = require('../models/user');
 const { sendResetPasswordEmail } = require('../helpers/emailHelper');
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const { email, password } = req.body;
+    console.log('Register attempt for email:', email);
 
-  if (user) {
-    throw createError(409, "Email already in use");
-  }
-
-  const newUser = await User.create({ email, password });
-
-  res.status(201).json({
-    status: 201,
-    message: "Registration successful",
-    data: {
-      user: {
-        email: newUser.email,
-        subscription: newUser.subscription
-      }
+    const user = await User.findOne({ email });
+    if (user) {
+      console.log('Email already exists:', email);
+      throw createError(409, "Email already in use");
     }
-  });
+
+    const newUser = await User.create({ email, password });
+    console.log('User created successfully:', newUser.email);
+
+    res.status(201).json({
+      status: 201,
+      message: "Registration successful",
+      data: {
+        user: {
+          email: newUser.email,
+          subscription: newUser.subscription
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    throw error;
+  }
 };
 
 const login = async (req, res) => {
