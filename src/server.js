@@ -9,6 +9,7 @@ const authRouter = require('./routers/auth');
 const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 
@@ -54,4 +55,17 @@ mongoose.connect(DB_HOST)
     process.exit(1);
   });
 
+function verifyToken(token) {
+    try {
+        return jwt.verify(token, 'your_secret_key'); // 'your_secret_key' yerine gerçek anahtarınızı koyun
+    } catch (error) {
+        return null; // Hata durumunda null döndür
+    }
+}
+
 // ... mevcut kod ...
+
+const user = verifyToken(token);
+if (!user) {
+    return res.status(401).json({ message: "Geçersiz veya süresi dolmuş token." });
+}
