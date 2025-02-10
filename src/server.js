@@ -22,6 +22,19 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+// Token'ı doğrulayan fonksiyon
+function verifyToken(token) {
+    if (!token) {
+        return null; // Token yoksa null döndür
+    }
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET); // Ortam değişkeninden anahtarı al
+    } catch (error) {
+        console.error("Token doğrulama hatası:", error); // Hata mesajını logla
+        return null; // Hata durumunda null döndür
+    }
+}
+
 // Ana rota (root route) için karşılama mesajı
 app.get('/', (req, res) => {
     res.status(200).json({
@@ -35,6 +48,19 @@ app.get('/', (req, res) => {
         note: "Bu ödev, Node.js'de e-posta ve resimlerle çalışma konusundaki yeni kavramları öğrenmenize yardımcı olacak ve dış hizmetlerle çalışma konusunda etkili uygulamaları keşfetmenizi sağlayacaktır.",
         encouragement: "O halde, zaman kaybetmeyelim — Hadi pratik yapalım by @gulayduzgun :) "
     });
+});
+
+// Korunan bir route örneği
+app.get('/protected-route', (req, res) => {
+    const token = req.headers['authorization']?.split(' ')[1]; // Bearer token'ı al
+    const user = verifyToken(token);
+    
+    if (!user) {
+        return res.status(401).json({ message: "Geçersiz veya süresi dolmuş token." });
+    }
+
+    // Token geçerliyse, kullanıcı bilgilerini döndür
+    res.json({ message: "Başarılı!", user });
 });
 
 app.use('/auth', authRouter);
@@ -54,18 +80,3 @@ mongoose.connect(DB_HOST)
     console.error('Veritabanı bağlantı hatası:', error);
     process.exit(1);
   });
-
-function verifyToken(token) {
-    try {
-        return jwt.verify(token, '00a8702d27c32c38b9b77f2711834d52fbe588cf4bbf06b28e0f8fc715c33c8f'); // 'your_secret_key' yerine gerçek anahtarınızı koyun
-    } catch (error) {
-        return null; // Hata durumunda null döndür
-    }
-}
-
-// ... mevcut kod ...
-
-const user = verifyToken(token);
-if (!user) {
-    return res.status(401).json({ message: "Geçersiz veya süresi dolmuş token." });
-}
