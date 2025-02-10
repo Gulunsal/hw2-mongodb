@@ -1,14 +1,16 @@
+const createError = require('http-errors');
+
 const validateBody = schema => {
-  return (req, res, next) => {
-    const { error } = schema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        status: 400,
-        message: error.details[0].message,
-      });
+  return async (req, res, next) => {
+    try {
+      await schema.validateAsync(req.body);
+      next();
+    } catch (error) {
+      next(createError(400, error.message));
     }
-    next();
   };
 };
 
-module.exports = validateBody; 
+module.exports = {
+  validateBody
+};

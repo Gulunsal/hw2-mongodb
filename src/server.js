@@ -1,24 +1,27 @@
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const fs = require('fs');
+const path = require('path');
 
-// Route imports
-const contactsRouter = require('./routes/contacts');
-const authRouter = require('./routes/auth');
+// Routes
+const authRoutes = require('./routes/authRoutes');
+const contactsRoutes = require('./routes/contactsRoutes');
 
-// Middleware imports
-const authenticate = require('./middlewares/authenticate');
+// Error handler
 const errorHandler = require('./middlewares/errorHandler');
-const notFoundHandler = require('./middlewares/notFoundHandler');
 
 dotenv.config();
-
 const app = express();
-const { DB_HOST } = process.env;
-const PORT = process.env.PORT || 10000;
+
+// Tmp klasörünü oluştur
+const tmpDir = path.join(__dirname, '../tmp');
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir);
+}
 
 // Middleware setup
 app.use(logger('dev'));
@@ -27,22 +30,40 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/auth', authRouter);
-app.use('/contacts', authenticate, contactsRouter);
+app.use('/auth', authRoutes);
+app.use('/contacts', contactsRoutes);
 
-// Error handling
-app.use(notFoundHandler);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    status: 404,
+    message: 'Not Found',
+    data: {}
+  });
+});
+
+// Error handler
 app.use(errorHandler);
 
 // Database connection and server start
+const { DB_HOST, PORT = 3000 } = process.env;
+
 mongoose.connect(DB_HOST)
   .then(() => {
-    console.log('Veritabanı bağlantısı başarılı');
+    console.log('Database connection successful');
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch(error => {
-    console.error('Veritabanı bağlantı hatası:', error);
+    console.error('Error connecting to the database:', error);
     process.exit(1);
   });
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  mongoose.connection.close(() => {
+    console.log('Database connection closed');
+    process.exit(0);
+  });
+});

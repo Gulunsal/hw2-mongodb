@@ -25,10 +25,10 @@ const sendResetPasswordEmail = async (email, resetLink) => {
   try {
     await transporter.sendMail(mailOptions);
   } catch (error) {
-    throw new Error('Email gönderilemedi');
+    throw new Error('Failed to send email');
   }
 };
 
 module.exports = {
   sendResetPasswordEmail
-}; 
+};
