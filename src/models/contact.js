@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
+const Joi = require('joi');
 
 const contactSchema = new mongoose.Schema({
   name: {
@@ -29,4 +30,22 @@ contactSchema.plugin(mongoosePaginate);
 
 const Contact = mongoose.model('Contact', contactSchema);
 
-module.exports = Contact; 
+// Validation şemaları
+const schemas = {
+  createContactSchema: Joi.object({
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().required()
+  }),
+  
+  updateContactSchema: Joi.object({
+    name: Joi.string(),
+    email: Joi.string().email(),
+    phone: Joi.string()
+  })
+};
+
+module.exports = {
+  Contact,
+  schemas
+}; 
