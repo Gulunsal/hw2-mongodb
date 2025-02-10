@@ -26,47 +26,26 @@ const getAllContacts = async (req, res) => {
 };
 
 const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const { _id: owner } = req.user;
-
-  const contact = await Contact.findOne({ _id: contactId, owner });
-  if (!contact) {
-    throw createError(404, "Contact not found");
-  }
-
-  res.json({
-    status: 200,
-    message: "Success",
-    data: {
-      contact
-    }
-  });
-};
-
-const createContact = async (req, res) => {
   try {
+    const { contactId } = req.params;
     const { _id: owner } = req.user;
-    let photo = null;
 
-    if (req.file) {
-      photo = await uploadImage(req.file.path);
+    const contact = await Contact.findOne({ _id: contactId, owner });
+    if (!contact) {
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found",
+        data: {}
+      });
     }
 
-    const contact = await Contact.create({
-      ...req.body,
-      owner,
-      photo
-    });
-
-    res.status(201).json({
-      status: 201,
-      message: "Contact created successfully",
-      data: {
-        contact
-      }
+    res.json({
+      status: 200,
+      message: "Success",
+      data: { contact }
     });
   } catch (error) {
-    console.error('Create contact error:', error);
+    console.error('Get contact error:', error);
     res.status(500).json({
       status: 500,
       message: error.message,
@@ -75,50 +54,95 @@ const createContact = async (req, res) => {
   }
 };
 
-const updateContact = async (req, res) => {
-  const { contactId } = req.params;
+const createContact = async (req, res) => {
   const { _id: owner } = req.user;
-  let updateData = { ...req.body };
+  let photo = null;
 
   if (req.file) {
-    updateData.photo = await uploadImage(req.file.path);
+    photo = await uploadImage(req.file.path);
   }
 
-  const contact = await Contact.findOneAndUpdate(
-    { _id: contactId, owner },
-    updateData,
-    { new: true }
-  );
+  const contact = await Contact.create({
+    ...req.body,
+    owner,
+    photo
+  });
 
-  if (!contact) {
-    throw createError(404, "Contact not found");
-  }
-
-  res.json({
-    status: 200,
-    message: "Contact updated successfully",
+  res.status(201).json({
+    status: 201,
+    message: "Contact created successfully",
     data: {
       contact
     }
   });
 };
 
-const deleteContact = async (req, res) => {
-  const { contactId } = req.params;
-  const { _id: owner } = req.user;
+const updateContact = async (req, res) => {
+  try {
+    const { contactId } = req.params;
+    const { _id: owner } = req.user;
+    let updateData = { ...req.body };
 
-  const contact = await Contact.findOneAndDelete({ _id: contactId, owner });
-  if (!contact) {
-    throw createError(404, "Contact not found");
-  }
-
-  res.json({
-    status: 200,
-    message: "Contact deleted successfully",
-    data: {
-      contact
+    if (req.file) {
+      updateData.photo = await uploadImage(req.file.path);
     }
-  });
+
+    const contact = await Contact.findOneAndUpdate(
+      { _id: contactId, owner },
+      updateData,
+      { new: true }
+    );
+
+    if (!contact) {
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found",
+        data: {}
+      });
+    }
+
+    res.json({
+      status: 200,
+      message: "Contact updated successfully",
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('Update contact error:', error);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+      data: {}
+    });
+  }
+};
+
+const deleteContact = async (req, res) => {
+  try {
+    const { contactId } = req.params;
+    const { _id: owner } = req.user;
+
+    const contact = await Contact.findOneAndDelete({ _id: contactId, owner });
+    if (!contact) {
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found",
+        data: {}
+      });
+    }
+
+    res.json({
+      status: 200,
+      message: "Contact deleted successfully",
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('Delete contact error:', error);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+      data: {}
+    });
+  }
 };
 
 module.exports = {
