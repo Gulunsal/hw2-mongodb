@@ -92,18 +92,26 @@ const sendResetEmail = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { token, password } = req.body;
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ email: decoded.email });
+    const { token, password } = req.body;
 
+    // Token'ı doğrula
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      throw createError(401, "Token is expired or invalid.");
+    }
+
+    // Kullanıcıyı bul
+    const user = await User.findOne({ email: decoded.email });
     if (!user) {
       throw createError(404, "User not found!");
     }
 
+    // Şifreyi güncelle
     user.password = password;
-    user.token = null;
+    user.token = null; // Mevcut oturumu sil
     await user.save();
 
     res.json({
@@ -111,9 +119,10 @@ const resetPassword = async (req, res) => {
       message: "Password has been successfully reset.",
       data: {}
     });
+
   } catch (error) {
-    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-      throw createError(401, "Token is expired or invalid.");
+    if (!error.status) {
+      error.status = 500;
     }
     throw error;
   }

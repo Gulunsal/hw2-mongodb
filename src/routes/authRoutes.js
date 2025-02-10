@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/authController');
-const { validateBody } = require('../middlewares/validateBody');
-const { registerSchema, loginSchema, resetEmailSchema, resetPasswordSchema } = require('../schemas/authSchema');
+const { validateBody, resetPasswordSchema } = require('../middlewares/validateBody');
+const { registerSchema, loginSchema, resetEmailSchema } = require('../schemas/authSchema');
 const authenticate = require('../middlewares/authenticate');
 
 // Auth routes
