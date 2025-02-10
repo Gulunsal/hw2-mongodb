@@ -61,68 +61,85 @@ const welcomeHTML = `
         }
         .method {
             font-weight: bold;
-            color: #333;
+            color: #fff;
+            padding: 3px 6px;
+            border-radius: 3px;
+            margin-right: 5px;
         }
-        .path {
-            color: #0066cc;
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-        }
-        h2 {
-            color: #666;
-            margin-top: 30px;
-        }
+        .get { background: #61affe; }
+        .post { background: #49cc90; }
+        .patch { background: #fca130; }
+        .delete { background: #f93e3e; }
+        .path { color: #3b4151; }
+        .multipart { color: #800080; font-style: italic; }
     </style>
 </head>
 <body>
-    <h1>📱 Contacts API Documentation</h1>
+    <h1>🌟 Contacts API</h1>
     
-    <h2>🔑 Authentication Endpoints</h2>
+    <h2>👤 Authentication</h2>
     <div class="endpoint">
-        <p><span class="method">POST</span> <span class="path">/auth/register</span></p>
+        <p><span class="method post">POST</span> <span class="path">/auth/register</span></p>
         <p>Register a new user</p>
     </div>
     <div class="endpoint">
-        <p><span class="method">POST</span> <span class="path">/auth/login</span></p>
+        <p><span class="method post">POST</span> <span class="path">/auth/login</span></p>
         <p>Login user</p>
     </div>
     <div class="endpoint">
-        <p><span class="method">POST</span> <span class="path">/auth/send-reset-email</span></p>
+        <p><span class="method post">POST</span> <span class="path">/auth/logout</span></p>
+        <p>Logout user</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method post">POST</span> <span class="path">/auth/send-reset-email</span></p>
         <p>Send password reset email</p>
     </div>
     <div class="endpoint">
-        <p><span class="method">POST</span> <span class="path">/auth/reset-pwd</span></p>
-        <p>Reset password</p>
+        <p><span class="method post">POST</span> <span class="path">/auth/reset-pwd</span></p>
+        <p>Reset password with token</p>
     </div>
 
-    <h2>📞 Contacts Endpoints</h2>
+    <h2>📝 Contacts</h2>
     <div class="endpoint">
-        <p><span class="method">GET</span> <span class="path">/contacts</span></p>
+        <p><span class="method get">GET</span> <span class="path">/contacts</span></p>
         <p>Get all contacts</p>
     </div>
     <div class="endpoint">
-        <p><span class="method">POST</span> <span class="path">/contacts</span></p>
-        <p>Create new contact</p>
-    </div>
-    <div class="endpoint">
-        <p><span class="method">GET</span> <span class="path">/contacts/:id</span></p>
+        <p><span class="method get">GET</span> <span class="path">/contacts/:id</span></p>
         <p>Get contact by ID</p>
     </div>
     <div class="endpoint">
-        <p><span class="method">PATCH</span> <span class="path">/contacts/:id</span></p>
-        <p>Update contact</p>
+        <p><span class="method post">POST</span> <span class="path">/contacts</span></p>
+        <p>Create new contact</p>
+        <p><span class="multipart">Supports multipart/form-data for photo upload</span></p>
+        <p>Fields:</p>
+        <ul>
+            <li>name (required)</li>
+            <li>email (required)</li>
+            <li>phone (required)</li>
+            <li>photo (optional) - Image file</li>
+        </ul>
     </div>
     <div class="endpoint">
-        <p><span class="method">DELETE</span> <span class="path">/contacts/:id</span></p>
+        <p><span class="method patch">PATCH</span> <span class="path">/contacts/:id</span></p>
+        <p>Update contact</p>
+        <p><span class="multipart">Supports multipart/form-data for photo upload</span></p>
+        <p>Fields:</p>
+        <ul>
+            <li>name (optional)</li>
+            <li>email (optional)</li>
+            <li>phone (optional)</li>
+            <li>photo (optional) - Image file</li>
+        </ul>
+    </div>
+    <div class="endpoint">
+        <p><span class="method delete">DELETE</span> <span class="path">/contacts/:id</span></p>
         <p>Delete contact</p>
     </div>
 
     <h2>🔍 Health Check</h2>
     <div class="endpoint">
-        <p><span class="method">GET</span> <span class="path">/api/health</span></p>
+        <p><span class="method get">GET</span> <span class="path">/api/health</span></p>
         <p>Check API status</p>
     </div>
 
