@@ -35,13 +35,13 @@ const schemas = {
   createContactSchema: Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().required()
+    phone: Joi.string().required()  // phoneNumber yerine phone
   }),
   
   updateContactSchema: Joi.object({
     name: Joi.string(),
     email: Joi.string().email(),
-    phone: Joi.string()
+    phone: Joi.string()  // phoneNumber yerine phone
   })
 };
 
