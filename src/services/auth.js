@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const createError = require('http-errors');
-const User = require('../models/user');
+const { User } = require('../models/user');
 const Session = require('../models/session');
 const { generateTokens } = require('../helpers/jwt');
 

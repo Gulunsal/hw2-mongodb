@@ -47,6 +47,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 const User = mongoose.model('User', userSchema);
 
+// Validation şemaları
 const schemas = {
   registerSchema: Joi.object({
     name: Joi.string().required(),
