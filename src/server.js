@@ -10,6 +10,7 @@ const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 const jwt = require('jsonwebtoken');
+const createError = require('http-errors');
 
 dotenv.config();
 
@@ -25,13 +26,14 @@ app.use(cookieParser());
 // Token'ı doğrulayan fonksiyon
 function verifyToken(token) {
     if (!token) {
-        return null; // Token yoksa null döndür
+        throw createError(401, "Token bulunamadı");
     }
     try {
-        return jwt.verify(token, process.env.JWT_SECRET); // Ortam değişkeninden anahtarı al
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return decoded;
     } catch (error) {
-        console.error("Token doğrulama hatası:", error); // Hata mesajını logla
-        return null; // Hata durumunda null döndür
+        console.error("Token doğrulama hatası:", error);
+        throw createError(401, "Geçersiz token");
     }
 }
 
@@ -51,16 +53,22 @@ app.get('/', (req, res) => {
 });
 
 // Korunan bir route örneği
-app.get('/protected-route', (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Bearer token'ı al
-    const user = verifyToken(token);
-    
-    if (!user) {
-        return res.status(401).json({ message: "Geçersiz veya süresi dolmuş token." });
+app.get('/protected-route', async (req, res, next) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        const decoded = verifyToken(token);
+        
+        // Kullanıcı bilgilerini döndür
+        res.json({ 
+            status: 200,
+            message: "Başarılı!",
+            data: {
+                userId: decoded.id 
+            }
+        });
+    } catch (error) {
+        next(error);
     }
-
-    // Token geçerliyse, kullanıcı bilgilerini döndür
-    res.json({ message: "Başarılı!", userId: user.userId }); // userId'yi döndür
 });
 
 app.use('/auth', authRouter);
