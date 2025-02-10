@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const { verifyToken } = require('../helpers/jwt');
-const User = require('../models/user');
+const { User } = require('../models/user');
 
 const authenticate = async (req, res, next) => {
   try {
