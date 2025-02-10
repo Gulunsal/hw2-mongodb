@@ -127,7 +127,7 @@ const welcomeHTML = `
     </div>
 
     <p style="margin-top: 40px; text-align: center; color: #666;">
-        Created by Your Name | Node.js Course HW6
+        Created by Gulay Duzgun | GoIT FullStack Course - Node.js HW6 
     </p>
 </body>
 </html>
