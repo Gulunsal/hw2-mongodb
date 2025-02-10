@@ -60,7 +60,7 @@ app.get('/protected-route', (req, res) => {
     }
 
     // Token geçerliyse, kullanıcı bilgilerini döndür
-    res.json({ message: "Başarılı!", user });
+    res.json({ message: "Başarılı!", userId: user.userId }); // userId'yi döndür
 });
 
 app.use('/auth', authRouter);
