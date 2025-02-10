@@ -39,6 +39,105 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+// Welcome page HTML
+const welcomeHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contacts API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .endpoint {
+            background: #f4f4f4;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .method {
+            font-weight: bold;
+            color: #333;
+        }
+        .path {
+            color: #0066cc;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #666;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📱 Contacts API Documentation</h1>
+    
+    <h2>🔑 Authentication Endpoints</h2>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="path">/auth/register</span></p>
+        <p>Register a new user</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="path">/auth/login</span></p>
+        <p>Login user</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="path">/auth/send-reset-email</span></p>
+        <p>Send password reset email</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="path">/auth/reset-pwd</span></p>
+        <p>Reset password</p>
+    </div>
+
+    <h2>📞 Contacts Endpoints</h2>
+    <div class="endpoint">
+        <p><span class="method">GET</span> <span class="path">/contacts</span></p>
+        <p>Get all contacts</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">POST</span> <span class="path">/contacts</span></p>
+        <p>Create new contact</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">GET</span> <span class="path">/contacts/:id</span></p>
+        <p>Get contact by ID</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">PATCH</span> <span class="path">/contacts/:id</span></p>
+        <p>Update contact</p>
+    </div>
+    <div class="endpoint">
+        <p><span class="method">DELETE</span> <span class="path">/contacts/:id</span></p>
+        <p>Delete contact</p>
+    </div>
+
+    <h2>🔍 Health Check</h2>
+    <div class="endpoint">
+        <p><span class="method">GET</span> <span class="path">/api/health</span></p>
+        <p>Check API status</p>
+    </div>
+
+    <p style="margin-top: 40px; text-align: center; color: #666;">
+        Created by Your Name | Node.js Course HW6
+    </p>
+</body>
+</html>
+`;
+
+// Welcome route
+app.get('/', (req, res) => {
+    res.send(welcomeHTML);
+});
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({
