@@ -3,30 +3,26 @@ const Contact = require('../models/contact');
 const { uploadImage } = require('../helpers/cloudinaryHelper');
 
 const getAllContacts = async (req, res) => {
-  const { _id: owner } = req.user;
-  const { page = 1, limit = 20 } = req.query;
-  
-  const options = {
-    page: parseInt(page),
-    limit: parseInt(limit),
-    populate: {
-      path: 'owner',
-      select: 'email subscription -_id'
-    }
-  };
-
-  const result = await Contact.paginate({ owner }, options);
-
-  res.json({
-    status: 200,
-    message: "Success",
-    data: {
-      contacts: result.docs,
-      totalPages: result.totalPages,
-      currentPage: result.page,
-      totalContacts: result.totalDocs
-    }
-  });
+  try {
+    const { _id: owner } = req.user;
+    const contacts = await Contact.find({ owner });
+    
+    res.json({
+      status: 200,
+      message: "Success",
+      data: {
+        contacts,
+        total: contacts.length
+      }
+    });
+  } catch (error) {
+    console.error('Get contacts error:', error);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+      data: {}
+    });
+  }
 };
 
 const getContactById = async (req, res) => {
@@ -48,26 +44,35 @@ const getContactById = async (req, res) => {
 };
 
 const createContact = async (req, res) => {
-  const { _id: owner } = req.user;
-  let photo = null;
+  try {
+    const { _id: owner } = req.user;
+    let photo = null;
 
-  if (req.file) {
-    photo = await uploadImage(req.file.path);
-  }
-
-  const contact = await Contact.create({
-    ...req.body,
-    owner,
-    photo
-  });
-
-  res.status(201).json({
-    status: 201,
-    message: "Contact created successfully",
-    data: {
-      contact
+    if (req.file) {
+      photo = await uploadImage(req.file.path);
     }
-  });
+
+    const contact = await Contact.create({
+      ...req.body,
+      owner,
+      photo
+    });
+
+    res.status(201).json({
+      status: 201,
+      message: "Contact created successfully",
+      data: {
+        contact
+      }
+    });
+  } catch (error) {
+    console.error('Create contact error:', error);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+      data: {}
+    });
+  }
 };
 
 const updateContact = async (req, res) => {
