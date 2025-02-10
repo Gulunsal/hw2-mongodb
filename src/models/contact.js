@@ -4,15 +4,15 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const contactSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
+    required: [true, 'Set name for contact'],
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: [true, 'Set email for contact'],
   },
   phone: {
     type: String,
-    required: [true, 'Phone is required'],
+    required: [true, 'Set phone for contact'],
   },
   photo: {
     type: String,
@@ -20,7 +20,7 @@ const contactSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'user',
     required: true,
   }
 }, { versionKey: false, timestamps: true });

@@ -1,6 +1,6 @@
-const createError = require('http-errors');
 const Contact = require('../models/contact');
 const { uploadImage } = require('../helpers/cloudinaryHelper');
+const fs = require('fs').promises;
 
 const getAllContacts = async (req, res) => {
   try {
@@ -55,26 +55,39 @@ const getContactById = async (req, res) => {
 };
 
 const createContact = async (req, res) => {
-  const { _id: owner } = req.user;
-  let photo = null;
+  try {
+    const { _id: owner } = req.user;
+    let photo = null;
 
-  if (req.file) {
-    photo = await uploadImage(req.file.path);
-  }
-
-  const contact = await Contact.create({
-    ...req.body,
-    owner,
-    photo
-  });
-
-  res.status(201).json({
-    status: 201,
-    message: "Contact created successfully",
-    data: {
-      contact
+    if (req.file) {
+      photo = await uploadImage(req.file.path);
+      await fs.unlink(req.file.path); // Temp dosyayı sil
     }
-  });
+
+    const contact = await Contact.create({
+      ...req.body,
+      owner,
+      photo
+    });
+
+    res.status(201).json({
+      status: 201,
+      message: "Contact created successfully",
+      data: {
+        contact
+      }
+    });
+  } catch (error) {
+    if (req.file) {
+      await fs.unlink(req.file.path).catch(console.error);
+    }
+    console.error('Create contact error:', error);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+      data: {}
+    });
+  }
 };
 
 const updateContact = async (req, res) => {
@@ -85,6 +98,7 @@ const updateContact = async (req, res) => {
 
     if (req.file) {
       updateData.photo = await uploadImage(req.file.path);
+      await fs.unlink(req.file.path);
     }
 
     const contact = await Contact.findOneAndUpdate(
@@ -107,6 +121,9 @@ const updateContact = async (req, res) => {
       data: { contact }
     });
   } catch (error) {
+    if (req.file) {
+      await fs.unlink(req.file.path).catch(console.error);
+    }
     console.error('Update contact error:', error);
     res.status(500).json({
       status: 500,

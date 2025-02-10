@@ -9,11 +9,17 @@ cloudinary.config({
 const uploadImage = async (filePath) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
-      folder: 'contacts'
+      folder: 'contacts',
+      use_filename: true,
+      unique_filename: true,
+      transformation: [
+        { width: 350, height: 350, crop: 'fill' }
+      ]
     });
     return result.secure_url;
   } catch (error) {
-    throw new Error('Image upload failed');
+    console.error('Cloudinary upload error:', error);
+    throw error;
   }
 };
 
