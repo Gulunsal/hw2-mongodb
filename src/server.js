@@ -57,7 +57,7 @@ mongoose.connect(DB_HOST)
 
 function verifyToken(token) {
     try {
-        return jwt.verify(token, 'your_secret_key'); // 'your_secret_key' yerine gerçek anahtarınızı koyun
+        return jwt.verify(token, '00a8702d27c32c38b9b77f2711834d52fbe588cf4bbf06b28e0f8fc715c33c8f'); // 'your_secret_key' yerine gerçek anahtarınızı koyun
     } catch (error) {
         return null; // Hata durumunda null döndür
     }
