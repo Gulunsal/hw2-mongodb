@@ -1,89 +1,136 @@
+const Contact = require('../models/contact');
 const createError = require('http-errors');
-const contactsService = require('../services/contacts');
 const { uploadImage } = require('../helpers/cloudinary');
-const fs = require('fs').promises;
 
 const getAllContacts = async (req, res) => {
-  const contacts = await contactsService.getAllContacts(req.user._id, req.query);
-  res.json({
-    status: 200,
-    message: "Successfully found contacts!",
-    data: contacts
-  });
+  try {
+    const { _id: owner } = req.user;
+    const contacts = await Contact.find({ owner });
+    
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contacts,
+        total: contacts.length
+      }
+    });
+  } catch (error) {
+    throw createError(500, "Failed to fetch contacts");
+  }
 };
 
 const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  const contact = await contactsService.getContactById(req.user._id, contactId);
-  if (!contact) {
-    throw createError(404, "Contact not found");
+  try {
+    const { contactId } = req.params;
+    const { _id: owner } = req.user;
+    
+    const contact = await Contact.findOne({ _id: contactId, owner });
+    if (!contact) {
+      throw createError(404, "Contact not found");
+    }
+
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contact
+      }
+    });
+  } catch (error) {
+    if (error.kind === 'ObjectId') {
+      throw createError(400, "Invalid contact ID");
+    }
+    throw error;
   }
-  res.json({
-    status: 200,
-    message: "Successfully found the contact!",
-    data: contact
-  });
 };
 
 const createContact = async (req, res) => {
-  let photoUrl = null;
-  
-  if (req.file) {
-    try {
-      photoUrl = await uploadImage(req.file.path);
-      await fs.unlink(req.file.path); // Dosyayı sil
-    } catch (error) {
-      await fs.unlink(req.file.path); // Hata durumunda da dosyayı sil
-      throw createError(500, "Error uploading image");
+  try {
+    const { _id: owner } = req.user;
+    let photo = null;
+
+    if (req.file) {
+      photo = await uploadImage(req.file.path);
     }
+
+    const contact = await Contact.create({
+      ...req.body,
+      owner,
+      photo
+    });
+
+    res.status(201).json({
+      status: "success",
+      code: 201,
+      data: {
+        contact
+      }
+    });
+  } catch (error) {
+    throw createError(500, "Failed to create contact");
   }
-
-  const contact = await contactsService.createContact(req.user._id, {
-    ...req.body,
-    photo: photoUrl
-  });
-
-  res.status(201).json({
-    status: 201,
-    message: "Successfully created a contact!",
-    data: contact
-  });
 };
 
 const updateContact = async (req, res) => {
-  const { contactId } = req.params;
-  let photoUrl = null;
+  try {
+    const { contactId } = req.params;
+    const { _id: owner } = req.user;
+    let updateData = { ...req.body };
 
-  if (req.file) {
-    try {
-      photoUrl = await uploadImage(req.file.path);
-      await fs.unlink(req.file.path);
-    } catch (error) {
-      await fs.unlink(req.file.path);
-      throw createError(500, "Error uploading image");
+    if (req.file) {
+      updateData.photo = await uploadImage(req.file.path);
     }
+
+    const contact = await Contact.findOneAndUpdate(
+      { _id: contactId, owner },
+      updateData,
+      { new: true }
+    );
+
+    if (!contact) {
+      throw createError(404, "Contact not found");
+    }
+
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contact
+      }
+    });
+  } catch (error) {
+    if (error.kind === 'ObjectId') {
+      throw createError(400, "Invalid contact ID");
+    }
+    throw error;
   }
-
-  const contact = await contactsService.updateContact(req.user._id, contactId, {
-    ...req.body,
-    ...(photoUrl && { photo: photoUrl })
-  });
-
-  if (!contact) {
-    throw createError(404, "Contact not found");
-  }
-
-  res.json({
-    status: 200,
-    message: "Successfully patched a contact!",
-    data: contact
-  });
 };
 
 const deleteContact = async (req, res) => {
-  const { contactId } = req.params;
-  await contactsService.deleteContact(req.user._id, contactId);
-  res.status(204).send();
+  try {
+    const { contactId } = req.params;
+    const { _id: owner } = req.user;
+
+    const contact = await Contact.findOneAndDelete({ _id: contactId, owner });
+    if (!contact) {
+      throw createError(404, "Contact not found");
+    }
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      message: "Contact deleted",
+      data: {
+        contact
+      }
+    });
+  } catch (error) {
+    if (error.kind === 'ObjectId') {
+      throw createError(400, "Invalid contact ID");
+    }
+    throw error;
+  }
 };
 
 module.exports = {

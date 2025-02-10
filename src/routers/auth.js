@@ -1,16 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/auth');
-const validateBody = require('../middlewares/validateBody');
-const authenticate = require('../middlewares/authenticate');
+const { validateBody } = require('../middlewares/validateBody');
 const { registerSchema, loginSchema, resetEmailSchema, resetPasswordSchema } = require('../schemas/auth');
-const ctrlWrapper = require('../utils/ctrlWrapper');
 
-router.post('/register', validateBody(registerSchema), ctrlWrapper(ctrl.register));
-router.post('/login', validateBody(loginSchema), ctrlWrapper(ctrl.login));
-router.post('/refresh', authenticate, ctrlWrapper(ctrl.refresh));
-router.post('/logout', authenticate, ctrlWrapper(ctrl.logout));
-router.get('/users', ctrlWrapper(ctrl.getAllUsers));
-router.post('/send-reset-email', validateBody(resetEmailSchema), ctrlWrapper(ctrl.sendResetEmail));
+router.post('/register', validateBody(registerSchema), ctrl.register);
+router.post('/login', validateBody(loginSchema), ctrl.login);
+router.post('/send-reset-email', validateBody(resetEmailSchema), ctrl.sendResetEmail);
+router.post('/reset-pwd', validateBody(resetPasswordSchema), ctrl.resetPassword);
+router.get('/current', authenticate, ctrl.getCurrent);
+router.post('/logout', authenticate, ctrl.logout);
 
 module.exports = router; 

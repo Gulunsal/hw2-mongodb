@@ -4,13 +4,15 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const contactsRouter = require('./routers/contacts');
-const authRouter = require('./routers/auth');
+
+// Route imports
+const contactsRouter = require('./routes/contacts');
+const authRouter = require('./routes/auth');
+
+// Middleware imports
 const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
-const jwt = require('jsonwebtoken');
-const createError = require('http-errors');
 
 dotenv.config();
 
@@ -18,65 +20,21 @@ const app = express();
 const { DB_HOST } = process.env;
 const PORT = process.env.PORT || 10000;
 
+// Middleware setup
 app.use(logger('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Token'ı doğrulayan fonksiyon
-function verifyToken(token) {
-    if (!token) {
-        throw createError(401, "Token bulunamadı");
-    }
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        return decoded;
-    } catch (error) {
-        console.error("Token doğrulama hatası:", error);
-        throw createError(401, "Geçersiz token");
-    }
-}
-
-// Ana rota (root route) için karşılama mesajı
-app.get('/', (req, res) => {
-    res.status(200).json({
-        message: "Bu, Node.js kursunun altıncı ev ödevi. Bu ödevde şifre sıfırlama işlevselliğini gerçekleştireceğiz ve öğrenciler için resim yükleme imkanı ekleyeceğiz. E-posta ve resim yönetimi için sırasıyla Brevo ve Cloudinary hizmetlerini kullanacağız.",
-        learnings: [
-            "Token kullanarak şifre sıfırlama işlevselliğini uygulamak.",
-            "E-posta göndermek için Brevo hizmetini kullanmak.",
-            "Cloudinary hizmetini kullanarak resim yüklemeyi entegre etmek.",
-            "Yeni işlevsellikleri desteklemek için modelleri ve uç noktaları genişletmek."
-        ],
-        note: "Bu ödev, Node.js'de e-posta ve resimlerle çalışma konusundaki yeni kavramları öğrenmenize yardımcı olacak ve dış hizmetlerle çalışma konusunda etkili uygulamaları keşfetmenizi sağlayacaktır.",
-        encouragement: "O halde, zaman kaybetmeyelim — Hadi pratik yapalım by @gulayduzgun :) "
-    });
-});
-
-// Korunan bir route örneği
-app.get('/protected-route', async (req, res, next) => {
-    try {
-        const token = req.headers['authorization']?.split(' ')[1];
-        const decoded = verifyToken(token);
-        
-        // Kullanıcı bilgilerini döndür
-        res.json({ 
-            status: 200,
-            message: "Başarılı!",
-            data: {
-                userId: decoded.id 
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
-});
-
+// Routes
 app.use('/auth', authRouter);
 app.use('/contacts', authenticate, contactsRouter);
-app.use('/images', require('./routers/imageRouter'));
+
+// Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+// Database connection and server start
 mongoose.connect(DB_HOST)
   .then(() => {
     console.log('Veritabanı bağlantısı başarılı');

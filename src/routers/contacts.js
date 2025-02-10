@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/contacts');
-const validateBody = require('../middlewares/validateBody');
-const isValidId = require('../middlewares/isValidId');
-const upload = require('../middlewares/upload');
+const { validateBody } = require('../middlewares/validateBody');
 const { createContactSchema, updateContactSchema } = require('../schemas/contact');
-const ctrlWrapper = require('../utils/ctrlWrapper');
+const authenticate = require('../middlewares/authenticate');
+const upload = require('../middlewares/upload');
 
-router.get('/', ctrlWrapper(ctrl.getAllContacts));
-router.get('/:contactId', isValidId, ctrlWrapper(ctrl.getContactById));
-router.post('/', upload.single('photo'), validateBody(createContactSchema), ctrlWrapper(ctrl.createContact));
-router.patch('/:contactId', isValidId, upload.single('photo'), validateBody(updateContactSchema), ctrlWrapper(ctrl.updateContact));
-router.delete('/:contactId', isValidId, ctrlWrapper(ctrl.deleteContact));
+// Tüm rotaları authenticate middleware'i ile koruyalım
+router.use(authenticate);
+
+router.get('/', ctrl.getAllContacts);
+router.get('/:contactId', ctrl.getContactById);
+router.post('/', upload.single('photo'), validateBody(createContactSchema), ctrl.createContact);
+router.patch('/:contactId', upload.single('photo'), validateBody(updateContactSchema), ctrl.updateContact);
+router.delete('/:contactId', ctrl.deleteContact);
 
 module.exports = router; 
