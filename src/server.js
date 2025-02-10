@@ -30,6 +30,17 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 200,
+    message: "Server is running",
+    data: {
+      timestamp: new Date(),
+      environment: process.env.NODE_ENV || 'development'
+    }
+  });
+});
+
 app.use('/auth', authRoutes);
 app.use('/contacts', contactsRoutes);
 
