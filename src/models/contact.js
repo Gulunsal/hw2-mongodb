@@ -1,8 +1,8 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 const Joi = require('joi');
 
-const contactSchema = new Schema({
+const contactSchema = mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Set name for contact'],
@@ -16,7 +16,7 @@ const contactSchema = new Schema({
     required: [true, 'Set phone number for contact'],
   },
   owner: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   }
@@ -24,7 +24,7 @@ const contactSchema = new Schema({
 
 contactSchema.plugin(mongoosePaginate);
 
-const Contact = model('Contact', contactSchema);
+const Contact = mongoose.model('Contact', contactSchema);
 
 // Validation şemaları
 const schemas = {

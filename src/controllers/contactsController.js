@@ -51,10 +51,10 @@ router.get('/:contactId', isValidId, async (req, res, next) => {
 // Create contact
 router.post('/', validateBody(createContactSchema), async (req, res, next) => {
   try {
-    const contact = await Contact.create({
-      ...req.body,
-      owner: req.user._id
-    });
+    const { name, email, phoneNumber } = req.body;
+    const { _id: owner } = req.user;
+
+    const contact = await Contact.create({ name, email, phoneNumber, owner });
     
     res.status(201).json({
       status: 201,
@@ -62,6 +62,7 @@ router.post('/', validateBody(createContactSchema), async (req, res, next) => {
       data: { contact }
     });
   } catch (error) {
+    console.error('Contact creation error:', error);
     next(error);
   }
 });
