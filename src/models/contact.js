@@ -31,13 +31,13 @@ const schemas = {
   createContactSchema: Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().required()  // phoneNumber yerine phone
+    phone: Joi.string().required()  
   }),
   
   updateContactSchema: Joi.object({
     name: Joi.string(),
     email: Joi.string().email(),
-    phone: Joi.string()  // phoneNumber yerine phone
+    phone: Joi.string() 
   })
 };
 
