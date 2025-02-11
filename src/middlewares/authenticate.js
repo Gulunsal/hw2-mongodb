@@ -1,30 +1,40 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const createError = require('http-errors');
-const { verifyToken } = require('../helpers/jwt');
-const { User } = require('../models/user');
 
 const authenticate = async (req, res, next) => {
   try {
-    const { authorization = '' } = req.headers;
-    const [bearer, token] = authorization.split(' ');
+    // Bearer token'ı al
+    const { authorization = "" } = req.headers;
+    const [bearer, token] = authorization.split(" ");
 
-    if (bearer !== 'Bearer') {
-      throw createError(401, 'Not authorized');
+    // Token formatını kontrol et
+    if (bearer !== "Bearer") {
+      throw createError(401, "Not authorized");
     }
 
-    const { userId } = verifyToken(token);
-    if (!userId) {
-      throw createError(401, 'Access token expired');
+    // Token'ı doğrula
+    if (!token) {
+      throw createError(401, "Not authorized");
     }
 
+    // Token'ı verify et
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Kullanıcıyı bul
     const user = await User.findById(userId);
     if (!user) {
-      throw createError(401, 'Not authorized');
+      throw createError(401, "Not authorized");
     }
 
+    // Kullanıcıyı request'e ekle
     req.user = user;
     next();
   } catch (error) {
-    next(createError(401, error.message));
+    if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
+      next(createError(401, "Token is invalid or expired"));
+    }
+    next(error);
   }
 };
 
