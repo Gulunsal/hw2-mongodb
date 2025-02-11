@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const Joi = require('joi');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -47,21 +46,4 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 const User = mongoose.model('User', userSchema);
 
-// Validation şemaları
-const schemas = {
-  registerSchema: Joi.object({
-    name: Joi.string().required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).required()
-  }),
-
-  loginSchema: Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).required()
-  })
-};
-
-module.exports = {
-  User,
-  schemas
-}; 
+module.exports = User; 
