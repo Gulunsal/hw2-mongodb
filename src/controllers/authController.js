@@ -22,14 +22,11 @@ router.post('/register', validateBody(registerSchema), async (req, res, next) =>
       });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
+    // Create user - artık şifre otomatik hashlenecek
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password // hash işlemi pre-save middleware'inde yapılacak
     });
 
     res.status(201).json({
@@ -62,8 +59,8 @@ router.post('/login', validateBody(loginSchema), async (req, res, next) => {
       });
     }
 
-    // Check password - bcrypt.compare kullanıyoruz
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Check password using comparePassword method
+    const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
         status: 401,
