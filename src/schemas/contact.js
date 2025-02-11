@@ -10,7 +10,7 @@ const updateContactSchema = Joi.object({
   name: Joi.string(),
   email: Joi.string().email(),
   phoneNumber: Joi.string()
-});
+}).min(1);
 
 module.exports = {
   createContactSchema,
