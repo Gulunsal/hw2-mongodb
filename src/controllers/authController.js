@@ -62,7 +62,7 @@ router.post('/login', validateBody(loginSchema), async (req, res, next) => {
       });
     }
 
-    // Check password
+    // Check password - bcrypt.compare kullanıyoruz
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -74,17 +74,20 @@ router.post('/login', validateBody(loginSchema), async (req, res, next) => {
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(user._id);
 
+    // Set refresh token in cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
+    // Send response with access token
     res.json({
       status: 200,
       message: "Successfully logged in an user!",
       data: { accessToken }
     });
   } catch (error) {
+    console.error('Login error:', error); // Hata loglaması ekleyelim
     next(error);
   }
 });
