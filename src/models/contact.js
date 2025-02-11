@@ -5,15 +5,15 @@ const Joi = require('joi');
 const contactSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Set name for contact'],
+    required: [true, 'Name is required'],
   },
   email: {
     type: String,
-    required: [true, 'Set email for contact'],
+    required: [true, 'Email is required'],
   },
-  phone: {
+  phoneNumber: {
     type: String,
-    required: [true, 'Set phone for contact'],
+    required: [true, 'Phone number is required'],
   },
   photo: {
     type: String,

@@ -2,10 +2,10 @@ const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const contactsRouter = require('./routers/contacts');
+const connectDB = require('./db/connection');
 const authRouter = require('./routes/auth');
+const contactsRouter = require('./routes/contacts');
 const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
@@ -13,7 +13,7 @@ const notFoundHandler = require('./middlewares/notFoundHandler');
 dotenv.config();
 
 const app = express();
-const { PORT = 3000, DB_HOST } = process.env;
+const { PORT = 3000 } = process.env;
 
 app.use(logger('dev'));
 app.use(cors());
@@ -127,16 +127,16 @@ app.use('/contacts', authenticate, contactsRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-mongoose.connect(DB_HOST)
-  .then(() => {
-    console.log('Veritabanı bağlantısı başarılı');
+const start = async () => {
+  try {
+    await connectDB();
     app.listen(PORT, () => {
       console.log(`Server ${PORT} portunda çalışıyor`);
     });
-  })
-  .catch(error => {
-    console.error('Veritabanı bağlantı hatası:', error);
+  } catch (error) {
+    console.error('Server başlatma hatası:', error);
     process.exit(1);
-  });
+  }
+};
 
-// ... mevcut kod ...
+start();
