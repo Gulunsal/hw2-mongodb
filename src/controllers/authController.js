@@ -1,15 +1,22 @@
+const express = require('express');
+const router = express.Router();
 const authService = require('../services/auth');
+const validateBody = require('../middlewares/validateBody');
+const { schemas } = require('../models/user');
+const authenticate = require('../middlewares/authenticate');
+const ctrlWrapper = require('../utils/ctrlWrapper');
 
-const register = async (req, res) => {
+// Auth routes
+router.post('/register', validateBody(schemas.registerSchema), async (req, res) => {
   const user = await authService.register(req.body);
   res.status(201).json({
     status: 201,
     message: "Successfully registered a user!",
     data: user
   });
-};
+});
 
-const login = async (req, res) => {
+router.post('/login', validateBody(schemas.loginSchema), async (req, res) => {
   const { email, password } = req.body;
   const { accessToken, refreshToken } = await authService.login(email, password);
 
@@ -23,9 +30,9 @@ const login = async (req, res) => {
     message: "Successfully logged in an user!",
     data: { accessToken }
   });
-};
+});
 
-const refresh = async (req, res) => {
+router.post('/refresh', authenticate, async (req, res) => {
   const { refreshToken } = req.cookies;
   const { userId } = req.user;
 
@@ -41,19 +48,14 @@ const refresh = async (req, res) => {
     message: "Successfully refreshed a session!",
     data: { accessToken: tokens.accessToken }
   });
-};
+});
 
-const logout = async (req, res) => {
+router.post('/logout', authenticate, async (req, res) => {
   const { userId } = req.user;
   await authService.logout(userId);
   
   res.clearCookie('refreshToken');
   res.status(204).send();
-};
+});
 
-module.exports = {
-  register,
-  login,
-  refresh,
-  logout
-}; 
+module.exports = router; 

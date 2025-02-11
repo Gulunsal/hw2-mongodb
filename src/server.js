@@ -4,15 +4,18 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const connectDB = require('./db/connection');
-const authRouter = require('./routes/auth');
-const contactsRouter = require('./routes/contacts');
+
+dotenv.config();
+const app = express();
+
+// Controllers
+const authController = require('./controllers/authController');
+const contactsController = require('./controllers/contactsController');
+
 const authenticate = require('./middlewares/authenticate');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 
-dotenv.config();
-
-const app = express();
 const { PORT = 3000 } = process.env;
 
 app.use(logger('dev'));
@@ -122,8 +125,11 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/auth', authRouter);
-app.use('/contacts', authenticate, contactsRouter);
+// Routes
+app.use('/auth', authController);
+app.use('/contacts', authenticate, contactsController);
+
+// Error handlers
 app.use(notFoundHandler);
 app.use(errorHandler);
 
