@@ -6,11 +6,7 @@ const connectDB = async () => {
       throw new Error('DB_HOST is not defined in environment variables');
     }
     
-    const conn = await mongoose.connect(process.env.DB_HOST, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-    
+    const conn = await mongoose.connect(process.env.DB_HOST);
     console.log('Veritabanı bağlantısı başarılı');
     return conn;
   } catch (error) {
