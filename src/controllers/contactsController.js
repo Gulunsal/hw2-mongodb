@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const { Contact } = require('../models/contact');
+const Contact = require('../models/contact');
 const { uploadImage } = require('../helpers/cloudinaryHelper');
 const fs = require('fs').promises;
 
