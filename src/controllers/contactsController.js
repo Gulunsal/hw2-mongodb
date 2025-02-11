@@ -4,7 +4,6 @@ const Contact = require('../models/contact');
 const validateBody = require('../middlewares/validateBody');
 const { createContactSchema, updateContactSchema } = require('../schemas/contact');
 const isValidId = require('../middlewares/isValidId');
-const upload = require('../middlewares/upload');
 
 // Get all contacts
 router.get('/', async (req, res, next) => {
@@ -50,7 +49,7 @@ router.get('/:contactId', isValidId, async (req, res, next) => {
 });
 
 // Create contact
-router.post('/', upload.single('photo'), validateBody(createContactSchema), async (req, res, next) => {
+router.post('/', validateBody(createContactSchema), async (req, res, next) => {
   try {
     const { _id: owner } = req.user;
     const newContact = {
@@ -72,7 +71,7 @@ router.post('/', upload.single('photo'), validateBody(createContactSchema), asyn
 });
 
 // Update contact
-router.patch('/:contactId', isValidId, upload.single('photo'), validateBody(updateContactSchema), async (req, res, next) => {
+router.patch('/:contactId', isValidId, validateBody(updateContactSchema), async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const { _id: owner } = req.user;
