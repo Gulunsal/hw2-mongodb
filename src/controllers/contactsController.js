@@ -4,60 +4,53 @@ const { uploadImage } = require('../helpers/cloudinaryHelper');
 const fs = require('fs').promises;
 
 const getAllContacts = async (req, res) => {
-  try {
-    const { _id: owner } = req.user;
-    const contacts = await Contact.find({ owner });
-    
-    res.json({
-      status: 200,
-      message: "Success",
-      data: {
-        contacts,
-        total: contacts.length
-      }
-    });
-  } catch (error) {
-    console.error('Get contacts error:', error);
-    res.status(500).json({
-      status: 500,
-      message: error.message,
-      data: {}
-    });
-  }
+  const { _id: owner } = req.user;
+  const contacts = await Contact.find({ owner });
+  
+  res.json({
+    status: 200,
+    message: "Success",
+    data: {
+      contacts,
+      total: contacts.length
+    }
+  });
 };
 
 const getContactById = async (req, res) => {
-  try {
-    const { contactId } = req.params;
-    const { _id: owner } = req.user;
-
-    const contact = await Contact.findOne({ _id: contactId, owner });
-    if (!contact) {
-      return res.status(404).json({
-        status: 404,
-        message: "Contact not found",
-        data: {}
-      });
-    }
-
-    res.json({
-      status: 200,
-      message: "Success",
-      data: { contact }
-    });
-  } catch (error) {
-    console.error('Get contact error:', error);
-    res.status(500).json({
-      status: 500,
-      message: error.message,
+  const { contactId } = req.params;
+  const { _id: owner } = req.user;
+  
+  const contact = await Contact.findOne({ _id: contactId, owner });
+  if (!contact) {
+    return res.status(404).json({
+      status: 404,
+      message: "Contact not found",
       data: {}
     });
   }
+  
+  res.json({
+    status: 200,
+    message: "Success",
+    data: { contact }
+  });
 };
 
 const createContact = async (req, res) => {
   const { _id: owner } = req.user;
-  const contact = await Contact.create({ ...req.body, owner });
+  let photoUrl = null;
+
+  if (req.file) {
+    photoUrl = await uploadImage(req.file.path);
+    await fs.unlink(req.file.path);
+  }
+
+  const contact = await Contact.create({ 
+    ...req.body, 
+    owner,
+    photo: photoUrl 
+  });
   
   res.status(201).json({
     status: 201,
@@ -67,71 +60,54 @@ const createContact = async (req, res) => {
 };
 
 const updateContact = async (req, res) => {
-  try {
-    const { contactId } = req.params;
-    const { _id: owner } = req.user;
-    let updateData = { ...req.body };
+  const { contactId } = req.params;
+  const { _id: owner } = req.user;
+  let photoUrl = undefined;
 
-    if (req.file) {
-      updateData.photo = await uploadImage(req.file.path);
-    }
+  if (req.file) {
+    photoUrl = await uploadImage(req.file.path);
+    await fs.unlink(req.file.path);
+  }
 
-    const contact = await Contact.findOneAndUpdate(
-      { _id: contactId, owner },
-      updateData,
-      { new: true }
-    );
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
+    { ...req.body, ...(photoUrl && { photo: photoUrl }) },
+    { new: true }
+  );
 
-    if (!contact) {
-      return res.status(404).json({
-        status: 404,
-        message: "Contact not found",
-        data: {}
-      });
-    }
-
-    res.json({
-      status: 200,
-      message: "Contact updated successfully",
-      data: { contact }
-    });
-  } catch (error) {
-    console.error('Update contact error:', error);
-    res.status(500).json({
-      status: 500,
-      message: error.message,
+  if (!contact) {
+    return res.status(404).json({
+      status: 404,
+      message: "Contact not found",
       data: {}
     });
   }
+
+  res.json({
+    status: 200,
+    message: "Contact updated successfully",
+    data: { contact }
+  });
 };
 
 const deleteContact = async (req, res) => {
-  try {
-    const { contactId } = req.params;
-    const { _id: owner } = req.user;
-
-    const contact = await Contact.findOneAndDelete({ _id: contactId, owner });
-    if (!contact) {
-      return res.status(404).json({
-        status: 404,
-        message: "Contact not found",
-        data: {}
-      });
-    }
-
-    res.json({
-      status: 200,
-      message: "Contact deleted successfully",
-      data: { contact }
-    });
-  } catch (error) {
-    console.error('Delete contact error:', error);
-    res.status(500).json({
-      status: 500,
-      message: error.message,
+  const { contactId } = req.params;
+  const { _id: owner } = req.user;
+  
+  const contact = await Contact.findOneAndDelete({ _id: contactId, owner });
+  if (!contact) {
+    return res.status(404).json({
+      status: 404,
+      message: "Contact not found",
       data: {}
     });
   }
+
+  res.json({
+    status: 200,
+    message: "Contact deleted successfully",
+    data: { contact }
+  });
 };
 
 module.exports = {
