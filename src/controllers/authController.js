@@ -7,9 +7,8 @@ const validateBody = require('../middlewares/validateBody');
 const { registerSchema, loginSchema } = require('../schemas/auth');
 const authService = require('../services/auth');
 const authenticate = require('../middlewares/authenticate');
-const ctrlWrapper = require('../utils/ctrlWrapper');
 
-// Auth routes
+// Register
 router.post('/register', validateBody(registerSchema), async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -90,35 +89,40 @@ router.post('/login', validateBody(loginSchema), async (req, res, next) => {
   }
 });
 
-const refresh = async (req, res) => {
-  const { refreshToken } = req.cookies;
-  const { userId } = req.user;
+// Refresh Token
+router.post('/refresh', authenticate, async (req, res, next) => {
+  try {
+    const { refreshToken } = req.cookies;
+    const { userId } = req.user;
 
-  const tokens = await authService.refresh(userId, refreshToken);
+    const tokens = await authService.refresh(userId, refreshToken);
 
-  res.cookie('refreshToken', tokens.refreshToken, {
-    httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000 // 30 gün
-  });
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 gün
+    });
 
-  res.json({
-    status: 200,
-    message: "Successfully refreshed a session!",
-    data: { accessToken: tokens.accessToken }
-  });
-};
+    res.json({
+      status: 200,
+      message: "Successfully refreshed a session!",
+      data: { accessToken: tokens.accessToken }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
-const logout = async (req, res) => {
-  const { userId } = req.user;
-  await authService.logout(userId);
-  
-  res.clearCookie('refreshToken');
-  res.status(204).send();
-};
+// Logout
+router.post('/logout', authenticate, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    await authService.logout(userId);
+    
+    res.clearCookie('refreshToken');
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
 
-module.exports = {
-  register: router.post('/register'),
-  login: router.post('/login'),
-  refresh,
-  logout
-}; 
+module.exports = router; 
