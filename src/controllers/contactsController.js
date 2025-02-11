@@ -9,7 +9,7 @@ const isValidId = require('../middlewares/isValidId');
 router.get('/', async (req, res, next) => {
   try {
     const { _id: owner } = req.user;
-    const contacts = await Contact.find({ owner });
+    const contacts = await Contact.find({ owner }).sort({ createdAt: -1 });
     
     res.json({
       status: 200,
@@ -51,14 +51,10 @@ router.get('/:contactId', isValidId, async (req, res, next) => {
 // Create contact
 router.post('/', validateBody(createContactSchema), async (req, res, next) => {
   try {
-    const { _id: owner } = req.user;
-    const newContact = {
+    const contact = await Contact.create({
       ...req.body,
-      owner
-    };
-
-    const contact = new Contact(newContact);
-    await contact.save();
+      owner: req.user._id
+    });
     
     res.status(201).json({
       status: 201,
