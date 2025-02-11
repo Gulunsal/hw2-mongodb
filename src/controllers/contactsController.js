@@ -1,7 +1,13 @@
+const express = require('express');
+const router = express.Router();
 const Contact = require('../models/contact');
-const createError = require('http-errors');
+const validateBody = require('../middlewares/validateBody');
+const { createContactSchema, updateContactSchema } = require('../schemas/contact');
+const isValidId = require('../middlewares/isValidId');
+const upload = require('../middlewares/upload');
 
-const getAllContacts = async (req, res) => {
+// Get all contacts
+router.get('/', async (req, res, next) => {
   try {
     const { _id: owner } = req.user;
     const contacts = await Contact.find({ owner });
@@ -15,18 +21,22 @@ const getAllContacts = async (req, res) => {
       }
     });
   } catch (error) {
-    throw createError(500, error.message);
+    next(error);
   }
-};
+});
 
-const getContactById = async (req, res) => {
+// Get contact by ID
+router.get('/:contactId', isValidId, async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const { _id: owner } = req.user;
     
     const contact = await Contact.findOne({ _id: contactId, owner });
     if (!contact) {
-      throw createError(404, "Contact not found");
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found"
+      });
     }
     
     res.json({
@@ -35,11 +45,12 @@ const getContactById = async (req, res) => {
       data: { contact }
     });
   } catch (error) {
-    throw createError(error.status || 500, error.message);
+    next(error);
   }
-};
+});
 
-const createContact = async (req, res) => {
+// Create contact
+router.post('/', upload.single('photo'), validateBody(createContactSchema), async (req, res, next) => {
   try {
     const { _id: owner } = req.user;
     const newContact = {
@@ -56,11 +67,12 @@ const createContact = async (req, res) => {
       data: { contact }
     });
   } catch (error) {
-    throw createError(500, error.message);
+    next(error);
   }
-};
+});
 
-const updateContact = async (req, res) => {
+// Update contact
+router.patch('/:contactId', isValidId, upload.single('photo'), validateBody(updateContactSchema), async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const { _id: owner } = req.user;
@@ -72,7 +84,10 @@ const updateContact = async (req, res) => {
     );
 
     if (!contact) {
-      throw createError(404, "Contact not found");
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found"
+      });
     }
 
     res.json({
@@ -81,18 +96,22 @@ const updateContact = async (req, res) => {
       data: { contact }
     });
   } catch (error) {
-    throw createError(error.status || 500, error.message);
+    next(error);
   }
-};
+});
 
-const deleteContact = async (req, res) => {
+// Delete contact
+router.delete('/:contactId', isValidId, async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const { _id: owner } = req.user;
     
     const contact = await Contact.findOneAndDelete({ _id: contactId, owner });
     if (!contact) {
-      throw createError(404, "Contact not found");
+      return res.status(404).json({
+        status: 404,
+        message: "Contact not found"
+      });
     }
 
     res.json({
@@ -101,14 +120,8 @@ const deleteContact = async (req, res) => {
       data: { contact }
     });
   } catch (error) {
-    throw createError(error.status || 500, error.message);
+    next(error);
   }
-};
+});
 
-module.exports = {
-  getAllContacts,
-  getContactById,
-  createContact,
-  updateContact,
-  deleteContact
-};
+module.exports = router;
