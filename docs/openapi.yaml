@@ -5,10 +5,10 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: |
-    Bu uygulama, kullanıcıların verilerini yönetmelerine ve analiz etmelerine olanak tanır.
+  description: >
+    <Bu uygulama, kullanıcıların verilerini yönetmelerine ve analiz etmelerine olanak tanır.
     Kullanıcılar, verilerini ekleyebilir, güncelleyebilir ve silebilir.
-    Ayrıca, uygulama kullanıcı dostu bir arayüze sahiptir ve hızlı bir şekilde işlem yapma imkanı sunar.
+    Ayrıca, uygulama kullanıcı dostu bir arayüze sahiptir ve hızlı bir şekilde işlem yapma imkanı sunar.>
 tags:
   # Kullanacağınız etiketler
 servers:
