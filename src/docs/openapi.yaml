@@ -12,7 +12,7 @@ info:
 tags:
   # Kullanacağınız etiketler
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:10000
   - url: https://hw2-mongodb-pl0r.onrender.com # Render linki
 paths:
   # Burada uç noktaların bağlantıları olacak
