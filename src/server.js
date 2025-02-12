@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./docs/openapi.yaml');
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
@@ -170,6 +172,9 @@ app.get('/api/health', (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/contacts', contactsRoutes);
+
+// API belgeleri rotasını ekleyin
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 404 handler
 app.use((req, res) => {
