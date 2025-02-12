@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('../docs/openapi.yaml');
+const YAML = require('js-yaml'); // npm install js-yaml
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
@@ -154,7 +154,7 @@ const welcomeHTML = `
 
 // Welcome route
 app.get('/', (req, res) => {
-    res.send(welcomeHTML);
+  res.send(welcomeHTML);
 });
 
 // Routes
@@ -173,7 +173,12 @@ app.get('/api/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/contacts', contactsRoutes);
 
-// API belgeleri rotasını ekleyin
+// --- Burada openapi.yaml'ı `js-yaml` ile okuyup parse ediyoruz --- //
+const swaggerFilePath = path.join(__dirname, '../docs/openapi.yaml');
+const swaggerFile = fs.readFileSync(swaggerFilePath, 'utf8');
+const swaggerDocument = YAML.load(swaggerFile);
+
+// API belgeleri rotası
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 404 handler
@@ -245,6 +250,6 @@ process.on('unhandledRejection', (error) => {
   console.error('Unhandled Rejection:', error);
   process.exit(1);
 });
+
 // Start the server
 startServer();
-
