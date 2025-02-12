@@ -1,20 +1,21 @@
 openapi: 3.1.0
 info:
   version: 1.0.0
-  title: <Contact App>
+  title: contact app
   license:
     name: Apache 2.0
-    url: <http://www.apache.org/licenses/LICENSE-2.0.html>
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   description: >
-    <uygulamanızın açıklaması>
+    Bu uygulama, kullanıcıların verilerini yönetmelerine ve analiz etmelerine olanak tanır. 
+    Kullanıcılar, verilerini ekleyebilir, güncelleyebilir ve silebilir. 
+    Ayrıca, uygulama kullanıcı dostu bir arayüze sahiptir ve hızlı bir şekilde işlem yapma imkanı sunar.
 tags:
-  # kullanacağınız etiketler
+  # Kullanacağınız etiketler
 servers:
-  - url: <http://localhost:10000>
-  - url: <https://contact-app-swagger.onrender.com>
+  - url: http://localhost:3000
   - url: https://hw2-mongodb-pl0r.onrender.com # Render linki
 paths:
-  # burada uç noktaların bağlantıları olacak
+  # Burada uç noktaların bağlantıları olacak
 components:
   securitySchemes:
     bearerAuth:
