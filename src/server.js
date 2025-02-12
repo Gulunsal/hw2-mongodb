@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./docs/openapi.yaml');
+const swaggerDocument = require('../docs/openapi.yaml');
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
