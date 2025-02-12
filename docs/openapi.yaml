@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   version: "1.0.0"
-  title: contact app
+  title: "Contact App"
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -9,13 +9,33 @@ info:
     Bu uygulama, kullanıcıların verilerini yönetmelerine ve analiz etmelerine olanak tanır.
     Kullanıcılar, verilerini ekleyebilir, güncelleyebilir ve silebilir.
     Ayrıca, uygulama kullanıcı dostu bir arayüze sahiptir ve hızlı bir şekilde işlem yapma imkanı sunar.
-tags:
-  # Kullanacağınız etiketler
+
 servers:
-  - url: http://localhost:10000
-  - url: https://hw2-mongodb-pl0r.onrender.com # Render linki
+  - url: "http://localhost:10000"
+  - url: "https://hw2-mongodb-pl0r.onrender.com"
+
 paths:
-  # Burada uç noktaların bağlantıları olacak
+  /auth/login:
+    post:
+      $ref: "./swagger/paths/auth/login.yaml#/"
+  /auth/register:
+    post:
+      $ref: "./swagger/paths/auth/register.yaml#/"
+
+  /contacts:
+    get:
+      $ref: "./swagger/paths/contact/get.yaml#/"
+    post:
+      $ref: "./swagger/paths/contact/post.yaml#/"
+
+  /contacts/{contactId}:
+    get:
+      $ref: "./swagger/paths/contact/get.yaml#/"
+    patch:
+      $ref: "./swagger/paths/contact/patch.yaml#/"
+    delete:
+      $ref: "./swagger/paths/contact/delete.yaml#/"
+
 components:
   securitySchemes:
     bearerAuth:

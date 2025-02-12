@@ -1,28 +1,34 @@
-tags:
-  - Authentication
-summary: User login
-operationId: userLogin
-description: Authenticate a user and return a token.
-requestBody:
-  required: true
-  content:
-    application/json:
-      schema:
-        type: object
-        properties:
-          email:
-            type: string
-          password:
-            type: string
-responses:
-  "200":
-    description: Successful login
+post:
+  tags:
+    - Authentication
+  summary: User login
+  operationId: userLogin
+  description: Authenticate a user and return a token.
+  requestBody:
+    required: true
     content:
       application/json:
         schema:
           type: object
           properties:
-            token:
+            email:
               type: string
-  "401":
-    description: Invalid credentials
+            password:
+              type: string
+          required:
+            - email
+            - password
+  responses:
+    "200":
+      description: Login successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+    "401":
+      description: Invalid credentials
+    "400":
+      description: Invalid input
