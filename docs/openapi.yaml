@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
   version: "1.0.0"
-  title: contact app
+  title: <contact app>
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: <http://www.apache.org/licenses/LICENSE-2.0.html>
   description: >
     <Bu uygulama, kullanıcıların verilerini yönetmelerine ve analiz etmelerine olanak tanır.
     Kullanıcılar, verilerini ekleyebilir, güncelleyebilir ve silebilir.
@@ -12,8 +12,8 @@ info:
 tags:
   # Kullanacağınız etiketler
 servers:
-  - url: http://localhost:10000
-  - url: https://hw2-mongodb-pl0r.onrender.com # Render linki
+  - url: <http://localhost:10000>
+  - url: <https://hw2-mongodb-pl0r.onrender.com> # Render linki
 paths:
   # Burada uç noktaların bağlantıları olacak
 components:
